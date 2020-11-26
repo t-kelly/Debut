@@ -1,0 +1,14 @@
+name: Greetings
+
+on: [pull_request]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: marocchino/sticky-pull-request-comment@v2.0.0
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        header: 'Preview Branch'
+        recreate: true
+        message: 'You can preview this branch at http://localhost:3000/preview/${{ github.head_ref }}'
