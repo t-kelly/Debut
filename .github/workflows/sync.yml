@@ -4,9 +4,8 @@ name: Sync Branches
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events
+  # Triggers the workflow on push events
   push:
-  pull_request:
 
 jobs:
   build:
@@ -15,10 +14,5 @@ jobs:
       - uses: nelonoel/branch-name@v1.0.1
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
       - name: Run sync command
-        run: |
-          curl https://servel.ngrok.io/sync/${BRANCH_NAME}
+        run: curl https://servel.ngrok.io/sync/${BRANCH_NAME}
