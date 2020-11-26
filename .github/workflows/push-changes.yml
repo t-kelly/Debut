@@ -1,0 +1,24 @@
+name: Push Changes to Shopify
+
+on:
+  # Anytime a change is pushed to any branch
+  push:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  SHOPIFY_HOST: ${{ secrets.SHOPIFY_HOST }}
+  SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm ci
+      - run: node_modules/.bin/shopify-website init Debut
+      - run: node_modules/.bin/shopify-website push --theme=Debut --verbose
+

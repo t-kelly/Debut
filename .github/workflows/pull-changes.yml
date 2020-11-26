@@ -1,0 +1,62 @@
+name: Pull changes from Shopify
+
+on:
+  workflow_dispatch:
+   
+env:
+  SHOPIFY_HOST: ${{ secrets.SHOPIFY_HOST }}
+  SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+  
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_ACTIONS_KEY }}
+      # Setup node
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - run: npm install
+        
+      - name: Create and push the release branch
+        run: |
+          git checkout -B update-from-shopify # -B will reset branch if it exists
+          git push --set-upstream --force origin update-from-shopify
+
+      - name: Get theme
+        run: node_modules/.bin/shopify-website --outputDir "$(pwd)" pull --theme 'main' 
+      - name: Commit to new branch
+        run: |
+          git config user.name "Github Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update theme from Shopify"
+          git push --set-upstream --force origin update-from-shopify
+
+      # For now, open a pr so we can see what's going on
+      - name: Create pull request
+        uses: actions/github-script@0.9.0
+        with:
+          script: |
+            const branch_name = 'update-from-shopify';
+            github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Update from Shopify (auto-generated)',
+              head: branch_name,
+              base: 'main',
+              body: ""
+            });
+            
+# Let's not run every 5 minutes till we know it works ;) 
+# schedule:
+# Run every 5 minutes
+#  - cron: '*/5 * * * *'  
+# Get theme id
+# This will need to get themes, and then iterate through all the ones for
+# this repo and update multiple branches
+# - name: Get theme
+# - run: THEME_ID=${node .github/scripts/getThemeId --store=$SHOPIFY_HOST --token=$SHOPIFY_PASSWORD --name=${GITHUB_REF##*/}}
