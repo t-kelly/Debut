@@ -1,0 +1,28 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Preview URL
+
+on: [pull_request]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: marocchino/sticky-pull-request-comment@v2.0.0
+      with:
+        # Header to determine if the comment is to be updated, not shown on screen
+        header: 'Preview Branch'
+        # Indicate if new comment messages should be appended to previous comment message
+        append: # optional
+        # Indicate if previous comment should be removed before creating a new comment
+        recreate: true
+        # comment message
+        message:  'You can preview this branch at http://localhost:3000/preview/${{ github.head_ref }}'
+        # path to file containing comment message
+        path: # optional
+        # pull request number for push event
+        number: # optional
+        # delete the previously created comment
+        delete: # optional
+        # set secrets.GITHUB_TOKEN here
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
