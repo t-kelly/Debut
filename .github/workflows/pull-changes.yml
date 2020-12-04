@@ -27,7 +27,9 @@ jobs:
           git push --set-upstream --force origin update-from-shopify
 
       - name: Get theme
-        run: node_modules/.bin/shopify-website --outputDir "$(pwd)" pull --theme 'main' 
+        run: node_modules/.bin/shopify-website --outputDir "$(pwd)" pull --theme '${{ secrets.THEME_NAME }}'
+      
+      # Assuming we want to merge into a branch of the same name in the new repo?
       - name: Commit to new branch
         run: |
           git config user.name "Github Actions"
@@ -35,28 +37,4 @@ jobs:
           git add -A
           git commit -m "Update theme from Shopify"
           git push --set-upstream --force origin update-from-shopify
-
-      # For now, open a pr so we can see what's going on
-      - name: Create pull request
-        uses: actions/github-script@0.9.0
-        with:
-          script: |
-            const branch_name = 'update-from-shopify';
-            github.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'Update from Shopify (auto-generated)',
-              head: branch_name,
-              base: 'main',
-              body: ""
-            });
-            
-# Let's not run every 5 minutes till we know it works ;) 
-# schedule:
-# Run every 5 minutes
-#  - cron: '*/5 * * * *'  
-# Get theme id
-# This will need to get themes, and then iterate through all the ones for
-# this repo and update multiple branches
-# - name: Get theme
-# - run: THEME_ID=${node .github/scripts/getThemeId --store=$SHOPIFY_HOST --token=$SHOPIFY_PASSWORD --name=${GITHUB_REF##*/}}
+          git merge main
